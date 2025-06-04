@@ -91,14 +91,3 @@ El sistema iniciará en `http://localhost:8080` por defecto.
 
 Este proyecto es de uso académico y no cuenta con una licencia abierta aún. Uso restringido para fines educativos.
 
-```
-
----
-
-### ✅ ¿Qué sigue?
-
-- Si tienes el **enlace real del repositorio GitHub**, puedo reemplazar la URL falsa en el `git clone`.
-- También te puedo generar el `README.md` en formato descargable si lo necesitas como archivo.
-
-¿Quieres que prepare además un ejemplo de **manual de usuario** o **manual técnico** para los anexos?
-```
