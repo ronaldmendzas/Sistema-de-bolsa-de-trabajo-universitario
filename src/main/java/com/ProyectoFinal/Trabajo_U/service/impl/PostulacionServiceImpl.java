@@ -8,6 +8,7 @@ import com.ProyectoFinal.Trabajo_U.repository.ConvocatoriasRepository;
 import com.ProyectoFinal.Trabajo_U.repository.PersonaRepository;
 import com.ProyectoFinal.Trabajo_U.repository.PostulacionRepository;
 import com.ProyectoFinal.Trabajo_U.service.PostulacionService;
+import com.lowagie.text.Font;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.*;
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class PostulacionServiceImpl implements PostulacionService {
@@ -88,5 +95,54 @@ public class PostulacionServiceImpl implements PostulacionService {
                 .personaId(p.getPersona().getId())
                 .convocatoriaId(p.getConvocatoria().getId())
                 .build();
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] generarReportePdf() throws DocumentException {
+        List<Postulacion> postulaciones = postulacionRepository.findAll();
+
+        Document document = new Document(PageSize.A4.rotate());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PdfWriter.getInstance(document, baos);
+
+        document.open();
+
+        Font fontTitulo = new Font(Font.HELVETICA, 18, Font.BOLD);
+        Paragraph titulo = new Paragraph("Reporte de Postulaciones", fontTitulo);
+        titulo.setAlignment(Element.ALIGN_CENTER);
+        titulo.setSpacingAfter(20);
+        document.add(titulo);
+
+        PdfPTable tabla = new PdfPTable(6);
+        tabla.setWidthPercentage(100);
+        tabla.setWidths(new float[]{1f, 3f, 3f, 3f, 3f, 3f});
+
+        // Encabezados
+        Stream.of("ID", "Fecha Postulación", "Estado", "Nombre Persona", "Apellido Persona", "Título Convocatoria")
+                .forEach(headerTitle -> {
+                    PdfPCell header = new PdfPCell();
+                    header.setBackgroundColor(Color.LIGHT_GRAY);
+                    header.setBorderWidth(1);
+                    header.setPhrase(new Phrase(headerTitle));
+                    tabla.addCell(header);
+                });
+
+        // Filas
+        for (Postulacion p : postulaciones) {
+            tabla.addCell(String.valueOf(p.getId()));
+            tabla.addCell(p.getFechaPostulacion() != null ? p.getFechaPostulacion().toString() : "");
+            tabla.addCell(p.getEstado());
+
+            // Obtenemos nombres de persona (asegúrate que getPersona() no sea proxy lazy cerrado)
+            tabla.addCell(p.getPersona() != null ? p.getPersona().getNombres() : "");
+            tabla.addCell(p.getPersona() != null ?
+                    p.getPersona().getApellidoPaterno() + " " + p.getPersona().getApellidoMaterno() : "");
+            tabla.addCell(p.getConvocatoria() != null ? p.getConvocatoria().getTitulo() : "");
+        }
+
+        document.add(tabla);
+        document.close();
+
+        return baos.toByteArray();
     }
 }
