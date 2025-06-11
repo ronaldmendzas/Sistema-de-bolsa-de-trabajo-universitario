@@ -1,6 +1,10 @@
 package com.ProyectoFinal.Trabajo_U.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +18,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Entity
 @Table(name = "estudiante")
+@PrimaryKeyJoinColumn(name = "id_persona")  // <-- Aquí está la clave
 public class Estudiante extends Persona {
 
     @Column(nullable = false, length = 100)

@@ -4,6 +4,10 @@ import com.ProyectoFinal.Trabajo_U.dto.ConvocatoriasDTO;
 import com.ProyectoFinal.Trabajo_U.service.ConvocatoriasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.lowagie.text.DocumentException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -43,5 +47,20 @@ public class ConvocatoriasController {
     @DeleteMapping("/{id}")
     public void eliminar(@PathVariable Long id) {
         convocatoriaService.eliminar(id);
+    }
+
+    @GetMapping(value = "/reporte/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> descargarReportePdf() {
+        try {
+            byte[] pdfBytes = convocatoriaService.generarReportePdf();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=convocatorias_reporte.pdf")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(pdfBytes);
+
+        } catch (DocumentException e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

@@ -13,4 +13,7 @@ public interface PostulacionService {
     PostulacionDTO actualizar(Long id, PostulacionDTO dto);
 
     void eliminar(Long id);
+
+    byte[] generarReportePdf() throws com.lowagie.text.DocumentException;
+
 }

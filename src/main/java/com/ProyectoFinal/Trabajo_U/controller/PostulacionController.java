@@ -4,7 +4,10 @@ import com.ProyectoFinal.Trabajo_U.dto.PostulacionDTO;
 import com.ProyectoFinal.Trabajo_U.service.PostulacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import com.lowagie.text.DocumentException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 @RestController
@@ -43,5 +46,20 @@ public class PostulacionController {
     @DeleteMapping("/{id}")
     public void eliminar(@PathVariable Long id) {
         postulacionService.eliminar(id);
+    }
+
+    @GetMapping(value = "/reporte/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> descargarReportePdf() {
+        try {
+            byte[] pdfBytes = postulacionService.generarReportePdf();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=postulaciones_reporte.pdf")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(pdfBytes);
+
+        } catch (DocumentException e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
