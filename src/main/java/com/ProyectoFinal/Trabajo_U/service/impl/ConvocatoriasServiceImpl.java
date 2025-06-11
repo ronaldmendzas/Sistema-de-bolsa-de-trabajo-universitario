@@ -1,15 +1,18 @@
 package com.ProyectoFinal.Trabajo_U.service.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ProyectoFinal.Trabajo_U.dto.ConvocatoriasDTO;
 import com.ProyectoFinal.Trabajo_U.model.Convocatorias;
 import com.ProyectoFinal.Trabajo_U.repository.ConvocatoriasRepository;
 import com.ProyectoFinal.Trabajo_U.service.ConvocatoriasService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ConvocatoriasServiceImpl implements ConvocatoriasService {
@@ -78,4 +81,11 @@ public class ConvocatoriasServiceImpl implements ConvocatoriasService {
                 .fechaCierre(c.getFechaCierre())
                 .build();
     }
+
+@Override
+public Page<ConvocatoriasDTO> listarPaginado(Pageable pageable) {
+    return convocatoriaRepository.findAll(pageable)
+            .map(this::entityToDto);
+}
+
 }
